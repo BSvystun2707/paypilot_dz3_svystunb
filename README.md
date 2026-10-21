@@ -1,3 +1,46 @@
+# L04 · RAGAS Diagnostic Report — PayPilot
+
+Набір із ДЗ №2: https://github.com/BSvystun2707/paypilot_dz2_svystunb
+
+## Запуск
+
+Покладіть `golden.jsonl` у `~/paypilot/l03/sets/` і виконайте:
+
+```bash
+docker compose run --rm eval --set golden --profile clean
+```
+
+`set_hash`: `a671e8586a20`
+
+## Retrieval-кейси
+
+| id | Джерело | Файл і рядок корпусу |
+| --- | --- | --- |
+| RET-H01 | Скарга C-13 | `app/rag/corpus/tariffs.md:16` |
+| RET-H02 | Скарга C-13 | `app/rag/corpus/tariffs.md:14` |
+| RET-H03 | Скарга C-13 | `app/rag/corpus/tariffs.md:15` |
+| RET-H04 | Edge case | `app/rag/corpus/tariffs.md:14` |
+| RET-H05 | Edge case | `app/rag/corpus/tariffs.md:23` |
+| RET-H06 | Edge case | `app/rag/corpus/tariffs.md:26` |
+| RET-H07 | Edge case | `app/rag/corpus/limits.md:11` |
+| RET-H08 | Edge case | `app/rag/corpus/limits.md:12` |
+| RET-H09 | Скарга C-14 | `app/rag/corpus/disputes.md:11` |
+| RET-H10 | Edge case | `app/rag/corpus/disputes.md:9` |
+
+## Прогони
+
+| Прогін | Профіль | Результат | Звіт |
+| --- | --- | --- | --- |
+| Baseline | `clean` | 45/45 | `reports/golden-clean-20261021T205950.json` |
+| Профіль заняття | `lesson-04` | 33/45 | `reports/golden-lesson-04-20261021T210531.json` |
+
+### Результати за шарами
+
+| Шар | `clean` | `lesson-04` |
+| --- | ---: | ---: |
+| Action | 4/4 | 4/4 |
+| Generation | 30/30 | 28/30 |
+| Retrieval | 11/11 | 1/11 |
 
 
 ### Прогноз до прогону `lesson-04`
@@ -13,4 +56,16 @@
 
 Найбільший ризик бачу в запитах, де необхідно повернути кілька пов’язаних значень з одного рядка таблиці або знайти конкретне значення серед кількох подібних правил. Водночас не стверджую, що всі перелічені кейси обов’язково впадуть: фактичний результат залежатиме від того, які фрагменти потраплять у пошукову видачу та як агент сформулює відповідь.
 
-Після прогону порівняю фактичні падіння з прогнозом і поясню кожну розбіжність.
+ 
+
+## Що впало після прогону
+
+У профілі `lesson-04` не пройшли 12 кейсів:
+
+`CMP-004`, `HW2-C01`, `HW2-C13`, `RET-H01`, `RET-H02`, `RET-H03`, `RET-H04`, `RET-H05`, `RET-H06`, `RET-H07`, `RET-H08`, `RET-H09`.
+
+Прогноз загалом підтвердився: retrieval знизився з 11/11 у `clean` до 1/11 у `lesson-04`. Дев’ять із десяти нових retrieval-кейсів `RET-H01`–`RET-H10` впали; `RET-H10` не входить до списку невдалих кейсів.
+
+Водночас прогноз не охопив усі регресії: додатково впали `CMP-004` і `HW2-C01` у generation та `HW2-C13`. Це показує, що погіршення не обмежилося новими retrieval-кейсами. Результати демонструють регресію на цьому наборі, але не доводять, що кожне падіння спричинене одним конкретним дефектом профілю.
+
+
